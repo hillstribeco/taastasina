@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Taastasina</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#191236">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="Taastasina" content="ScoreCard">
+<style>
+:root[data-tab="d"]{--bg:#361D12;--surface:#452719;--border:#6B4130;--text:#F6EDE7;--muted:#C9A996;--accent:#E8823C;--accent-fg:#1A0E07;--danger:#FF6B5B;--win:#5FD68A}
+:root[data-tab="m"]{--bg:#191236;--surface:#241A4A;--border:#3D2F6E;--text:#EDEAF9;--muted:#A79CC9;--accent:#8B6CF0;--accent-fg:#0E0A1F;--danger:#FF6B7A;--win:#5FD68A}
+:root[data-tab="l"]{--bg:#0F0F14;--surface:#1A1A22;--border:#33333F;--text:#F0F0F5;--muted:#9A9AA8;--accent:#7A8CFF;--accent-fg:#0A0B14;--danger:#FF6B7A;--win:#5FD68A}
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(10px + env(safe-area-inset-bottom,0px));transition:background-color .2s;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+#mc{text-align:center;font-size:26px;font-weight:800;margin:0 0 4px}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tab{flex:1;height:52px;font-size:18px;font-weight:700;border:2px solid var(--border);border-radius:12px;background:transparent;color:var(--text)}
+.tab.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+#game{display:flex;flex-direction:column;flex:1;min-height:0}
+.grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 40px;gap:6px;align-items:center}
+.name{background:none;border:none;font-size:20px;font-weight:700;padding:8px 0;text-decoration:underline dotted;text-underline-offset:4px;text-decoration-color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dealerbar{display:flex;margin:4px 0 8px}
+#dealerbar button{flex:1;height:46px;font-size:17px;font-weight:700;border:2px dashed var(--accent);border-radius:10px;background:transparent;color:var(--accent)}
+#rows{flex:1;overflow-y:auto;min-height:0;padding:4px 0;-webkit-overflow-scrolling:touch}
+.row{margin:6px 0}
+.row>span{font-size:16px;font-weight:600;color:var(--muted)}
+.row input{width:100%;height:52px;font-size:24px;font-weight:700;text-align:center;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}
+.row input:focus{outline:3px solid var(--accent);outline-offset:-2px;border-color:var(--accent)}
+.row input.xbox{color:var(--muted);font-size:22px}
+.x{font-size:20px;color:var(--muted);height:44px;padding:0;border-radius:8px}
+.x:active{background:var(--border)}
+.total{border-top:3px solid var(--text);padding-top:8px;margin-top:4px}
+.total span{font-size:20px;font-weight:700}
+.total b{font-size:34px;text-align:center;font-weight:800}
+.red{color:var(--danger)!important}
+#rem{color:var(--danger);font-weight:800;font-size:20px;min-height:26px;margin:6px 0}
+.msg{font-size:20px;font-weight:700;min-height:26px;margin:4px 0}
+.btns{display:flex;gap:8px;margin-top:6px}
+.btns button{flex:1;height:60px;font-size:18px;font-weight:700;border-radius:12px;border:2px solid var(--border);background:transparent;color:var(--text)}
+.btns button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btns button:active{opacity:.85}
+#logv{overflow-y:auto;flex:1;min-height:0}
+#logv .big{font-size:24px;font-weight:800;text-align:center;margin:8px 0 4px}
+#logv h3{font-size:20px;margin:18px 0 6px}
+#logv h4{font-size:18px;margin:14px 0 4px;color:var(--muted)}
+#logv table{width:100%;border-collapse:collapse;font-size:18px}
+#logv th,#logv td{padding:10px 4px;border-bottom:1px solid var(--border);text-align:center}
+#logv th{font-weight:800}
+#logv td.won{color:var(--win);font-weight:700}
+#logv td.lost{color:var(--danger);font-weight:700}
+#logv .sum div{font-size:18px;font-weight:700;padding:3px 0}
+dialog{background:var(--surface);color:var(--text);border:2px solid var(--border);border-radius:14px;width:min(86vw,340px);padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.65)}
+dialog p{font-size:19px;font-weight:700;margin:0 0 14px;line-height:1.35}
+#di{width:100%;height:48px;font-size:20px;margin-bottom:14px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);padding:0 12px;box-sizing:border-box}
+#di:focus{outline:none;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div id="mc"></div>
+<div class="tabs">
+  <button class="tab" data-t="d">Dhumbal</button>
+  <button class="tab" data-t="m">Marriage</button>
+  <button class="tab" data-t="l">Log</button>
+</div>
+<div id="game">
+  <div class="grid"><span style="font-weight:700;font-size:16px;color:var(--muted)">Game</span>
+    <button class="name" id="n0"></button><button class="name" id="n1"></button><span></span></div>
+  <div id="dealerbar" hidden><button id="dealerbtn" type="button"></button></div>
+  <div id="rows"></div>
+  <div class="grid total"><span>Total</span><b id="ta">0</b><b id="tb">0</b><span></span></div>
+  <div id="rem"></div>
+  <div class="msg" id="msg"></div>
+  <div class="btns">
+    <button id="reset">Reset</button>
+    <button id="start" class="primary">Start New Game</button>
+  </div>
+</div>
+<div id="logv" hidden></div>
+<dialog id="dlg">
+  <p id="dt"></p>
+  <input id="di" hidden maxlength="12" autocomplete="off">
+  <div class="btns">
+    <button id="dc">Cancel</button>
+    <button id="dok" class="primary">OK</button>
+  </div>
+</dialog>
+<script>
+const K="csc-v2", MGAMES=5;
+const blank=()=>({names:["Manu","Smriti"],rows:[["",""]],match:1,past:[],dealer:0});
+let S={cur:"d",d:blank(),m:blank()};
+try{
+  const x=JSON.parse(localStorage.getItem(K));
+  if(x&&x.d&&x.m){
+    S=x;
+    if(!S.cur)S.cur="d";
+    ["d","m"].forEach(k=>{
+      const t=S[k];
+      t.match=t.match||1; t.past=t.past||[]; t.rows=t.rows||[["",""]];
+      if(typeof t.dealer!=="number")t.dealer=0;
+      t.names=(t.names&&t.names.length===2?t.names:["Manu","Smriti"]).map(n=>n==="Manoj"?"Manu":n);
+    });
+  }
+}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const T=()=>S[S.cur], isD=()=>S.cur==="d";
+const num=s=>(s===""||s==="X")?0:(parseInt(s,10)||0);
+const ord=n=>{const s=(n%100>=11&&n%100<=13)?"th":(["th","st","nd","rd"][n%10]||"th");return n+s};
+const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e};
+
+function calc(t){
+  let a=0,b=0,loser=-1;
+  t.rows.forEach(r=>{
+    a+=num(r[0]);b+=num(r[1]);
+    if(loser<0){if(a>=100)loser=0;else if(b>=100)loser=1}
+  });
+  return {a,b,loser,over:loser>=0};
+}
+function lastScorer(t){
+  for(let i=t.rows.length-1;i>=0;i--){
+    const r=t.rows[i];
+    if(r[0]!==""&&r[0]!=="X")return 0;
+    if(r[1]!==""&&r[1]!=="X")return 1;
+  }
+  return null;
+}
+const hasScore=r=>(r[0]!==""&&r[0]!=="X")||(r[1]!==""&&r[1]!=="X");
+const mFull=r=>r&&r[0]!==""&&r[1]!=="";
+const completeGames=t=>t.rows.filter(mFull).length;
+const mOver=t=>completeGames(t)>=MGAMES;
+const anyScore=t=>t.rows.some(r=>r[0]!==""||r[1]!=="");
+
+function summary(){
+  const t=T(),d=isD(),c=calc(t),m=$("msg");
+  $("ta").textContent=c.a; $("tb").textContent=c.b;
+  $("ta").classList.toggle("red",d&&c.loser===0);
+  $("tb").classList.toggle("red",d&&c.loser===1);
+  if(d){
+    const ls=lastScorer(t);
+    $("rem").textContent=ls===null?"":"Dealer: "+t.names[ls];
+    m.textContent=c.over?t.names[1-c.loser]+" wins":"";
+    m.className="msg red";
+   }else{
+    const curIdx=Math.min(t.rows.length-1,MGAMES-1);
+    const dealer=((t.dealer||0)+curIdx)%2;
+    $("rem").textContent=mOver(t)?"":"Dealer: "+t.names[dealer];
+    if(mOver(t)){
+      const diff=c.a-c.b;
+      m.textContent=diff===0?"Match Tied":t.names[diff>0?0:1]+" wins";
+      m.className="msg red";
+    }else{
+      m.textContent=c.a===c.b?"Difference: Tied":"Difference: "+(c.a>c.b?t.names[0]:t.names[1])+" leads by "+Math.abs(c.a-c.b);
+      m.className="msg";
+    }
+  }
+}
+
+function makeRow(i){
+  const t=T(),r=t.rows[i],d=isD();
+  const row=el("div",null,"grid row"); row.dataset.i=i;
+  row.append(el("span",ord(i+1)+" Game"));
+  [0,1].forEach(j=>{
+    const inp=document.createElement("input");
+    inp.type="text"; inp.inputMode="numeric"; inp.maxLength=4; inp.value=r[j];
+    inp.setAttribute("aria-label",ord(i+1)+" game, "+t.names[j]);
+    if(d&&r[j]==="X"){inp.readOnly=true; inp.classList.add("xbox")}
+    inp.oninput=()=>onType(i,j,inp);
+    inp.onchange=()=>{if(d)commit(inp,j)};
+    inp.onkeydown=e=>{if(e.key==="Enter")inp.blur()};
+    row.append(inp);
+  });
+  const x=el("button","✕","x"); x.setAttribute("aria-label","Delete game");
+  x.onclick=()=>{
+    const cur=T();
+    const go=()=>{
+      if(cur.rows.length===1) cur.rows[0]=["",""];
+      else cur.rows.splice(i,1);
+      if(isD()){
+        if(!calc(cur).over&&cur.rows.length&&hasScore(cur.rows[cur.rows.length-1])) cur.rows.push(["",""]);
+      }else if(!mOver(cur)&&cur.rows.length<MGAMES&&mFull(cur.rows[cur.rows.length-1])){
+        cur.rows.push(["",""]);
+      }
+      save(); render();
+    };
+    hasScore(cur.rows[i])||mFull(cur.rows[i]) ? ask("Delete this game?","Delete",null,go) : go();
+  };
+  row.append(x);
+  return row;
+}
+
+function onType(i,j,inp){
+  const t=T(),d=isD();
+  const v=inp.value.replace(/\D/g,"").slice(0,4);
+  inp.value=v;
+  t.rows[i][j]=v;
+  if(d&&v==="") commit(inp,j);
+  if(!d){
+    if(i===t.rows.length-1&&mFull(t.rows[i])&&t.rows.length<MGAMES){
+      t.rows.push(["",""]);
+      const nr=makeRow(t.rows.length-1);
+      $("rows").append(nr);
+      nr.scrollIntoView({block:"nearest"});
+    }
+  }
+  save(); summary();
+}
+
+function commit(inp,j){
+  const row=inp.closest(".row"); if(!row)return;
+  const i=+row.dataset.i, t=T(), r=t.rows[i]; if(!r)return;
+  r[1-j]=r[j]===""?"":"X";
+  const other=row.querySelectorAll("input")[1-j];
+  other.value=r[1-j];
+  other.readOnly=r[1-j]==="X";
+  other.classList.toggle("xbox",r[1-j]==="X");
+  if(r[j]!==""&&i===t.rows.length-1&&!calc(t).over){
+    t.rows.push(["",""]);
+    const nr=makeRow(i+1);
+    $("rows").append(nr);
+  }
+  save(); summary();
+}
+
+function gamesOf(tab){
+  const t=S[tab], list=t.past.map(p=>({match:p.match,winner:p.winner}));
+  if(tab==="d"){const c=calc(t);if(c.over)list.push({match:t.match||1,winner:1-c.loser})}
+  if(tab==="m"&&mOver(t)){const c=calc(t);list.push({match:t.match||1,winner:c.a>c.b?0:c.b>c.a?1:-1})}
+  return list;
+}
+
+function tableFor(tab,title,list){
+  const t=S[tab], s=el("div");
+  s.append(el("h3",title+" — "+list.length+" game"+(list.length===1?"":"s")+" played"));
+  if(!list.length){s.append(el("div","No games yet."));return s}
+  const tb=el("table"), hd=el("tr");
+  ["Game",t.names[0],t.names[1]].forEach(x=>hd.append(el("th",x)));
+  tb.append(hd);
+  list.forEach(g=>{
+    const tr=el("tr");
+    tr.append(el("td","Game "+g.match));
+    [0,1].forEach(i=>{
+      if(g.winner<0)tr.append(el("td","Tie"));
+      else if(g.winner===i)tr.append(el("td","Won","won"));
+      else tr.append(el("td","Loss","lost"));
+    });
+    tb.append(tr);
+  });
+  s.append(tb,el("h4","Summary"));
+  const sum=el("div",null,"sum");
+  [0,1].forEach(i=>{
+    const w=list.filter(g=>g.winner===i).length, l=list.filter(g=>g.winner===1-i).length;
+    sum.append(el("div",t.names[i]+": "+w+" win"+(w===1?"":"s")+", "+l+" loss"+(l===1?"":"es")));
+  });
+  s.append(sum);
+  return s;
+}
+
+function renderLogTab(){
+  const box=$("logv"); box.innerHTML="";
+  const dl=gamesOf("d"), ml=gamesOf("m");
+  box.append(el("div","Total games played: "+(dl.length+ml.length),"big"));
+  box.append(tableFor("d","Dhumbal",dl));
+  box.append(tableFor("m","Marriage",ml));
+}
+
+function render(){
+  document.documentElement.dataset.tab=S.cur;
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content",{d:"#361D12",m:"#191236",l:"#0F0F14"}[S.cur]||"#191236");
+  const logv=S.cur==="l";
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.t===S.cur));
+  $("game").hidden=logv; $("logv").hidden=!logv;
+  if(logv){$("mc").textContent="";$("dealerbar").hidden=true;renderLogTab();return}
+  const t=T(), d=isD();
+  if(!d){
+    while(t.rows.length>MGAMES&&t.rows[t.rows.length-1][0]===""&&t.rows[t.rows.length-1][1]==="")t.rows.pop();
+    if(!mOver(t)&&t.rows.length<MGAMES&&mFull(t.rows[t.rows.length-1])){t.rows.push(["",""]);save()}
+  }
+  $("mc").textContent=d?"Game "+(t.match||1):"Game "+Math.min(t.rows.length,MGAMES)+" of "+MGAMES;
+  $("n0").textContent=t.names[0]; $("n1").textContent=t.names[1];
+  $("reset").hidden=d; // Reset only on Marriage
+  const fresh=!d&&!anyScore(t);
+  $("dealerbar").hidden=!fresh;
+  if(fresh)$("dealerbtn").textContent="Dealer: "+t.names[t.dealer||0]+" (tap to change)";
+  const box=$("rows"); box.innerHTML="";
+  t.rows.forEach((_,i)=>box.append(makeRow(i)));
+  summary();
+}
+
+let cb=null;
+function ask(title,ok,val,fn){
+  $("dt").textContent=title; $("dok").textContent=ok;
+  $("di").hidden=val===null; if(val!==null)$("di").value=val;
+  cb=fn; $("dlg").showModal();
+}
+$("dok").onclick=()=>{$("dlg").close();if(cb)cb($("di").value)};
+$("dc").onclick=()=>$("dlg").close();
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{S.cur=b.dataset.t;save();render()});
+[0,1].forEach(i=>$("n"+i).onclick=()=>ask("Player name","OK",T().names[i],v=>{
+  v=(v||"").trim().slice(0,12); if(v){T().names[i]=v; save(); render()}
+}));
+
+$("dealerbtn").onclick=()=>{
+  if(isD())return;
+  const t=T(); if(anyScore(t))return;
+  t.dealer=1-(t.dealer||0); save(); render();
+};
+
+$("reset").onclick=()=>ask("Reset this tab? The rows clear. Nothing is recorded in the log.","Reset",null,()=>{
+  T().rows=[["",""]]; save(); render();
+});
+
+$("start").onclick=()=>{
+  const next=(T().match||1)+1;
+  ask("Start Game "+next+"? The current rows will be cleared.","Start",null,()=>{
+    const t=T(), c=calc(t), m=t.match||1;
+    if(isD()){ if(c.over)t.past.push({match:m,winner:1-c.loser}); }
+    else if(mOver(t)){ t.past.push({match:m,winner:c.a>c.b?0:c.b>c.a?1:-1}); }
+    t.match=m+1; t.rows=[["",""]]; t.dealer=0; save(); render();
+  });
+};
+
+render();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
