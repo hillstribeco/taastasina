@@ -1,4 +1,4 @@
-const CACHE="card-score-v2";
+const CACHE="card-score-v3";
 const ASSETS=["./","./index.html","./manifest.json","./icon.svg","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",e=>{
