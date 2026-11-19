@@ -58,6 +58,7 @@ button{background:none;border:none;cursor:pointer}
 #logv td.won{color:var(--win);font-weight:700}
 #logv td.lost{color:var(--danger);font-weight:700}
 #logv .sum div{font-size:18px;font-weight:700;padding:3px 0}
+#logv hr.log-divider{border:none;border-top:2px solid var(--border);margin:22px 0 8px}
 dialog{background:var(--surface);color:var(--text);border:2px solid var(--border);border-radius:14px;width:min(86vw,340px);padding:18px}
 dialog::backdrop{background:rgba(0,0,0,.65)}
 dialog p{font-size:19px;font-weight:700;margin:0 0 14px;line-height:1.35}
@@ -66,7 +67,7 @@ dialog p{font-size:19px;font-weight:700;margin:0 0 14px;line-height:1.35}
 </style>
 </head>
 <body>
-<div id="mc"></div>
+<div id="mc" hidden></div>  $("mc").textContent=d?"Game "+(t.match||1):"Game "+Math.min(t.rows.length,MGAMES)+" of "+MGAMES;
 <div class="tabs">
   <button class="tab" data-t="d">Dhumbal</button>
   <button class="tab" data-t="m">Marriage</button>
@@ -270,6 +271,7 @@ function renderLogTab(){
   const dl=gamesOf("d"), ml=gamesOf("m");
   box.append(el("div","Total games played: "+(dl.length+ml.length),"big"));
   box.append(tableFor("d","Dhumbal",dl));
+  box.append(el("hr", null, "log-divider"));
   box.append(tableFor("m","Marriage",ml));
 }
 
@@ -286,7 +288,7 @@ function render(){
     while(t.rows.length>MGAMES&&t.rows[t.rows.length-1][0]===""&&t.rows[t.rows.length-1][1]==="")t.rows.pop();
     if(!mOver(t)&&t.rows.length<MGAMES&&mFull(t.rows[t.rows.length-1])){t.rows.push(["",""]);save()}
   }
-  $("mc").textContent=d?"Game "+(t.match||1):"Game "+Math.min(t.rows.length,MGAMES)+" of "+MGAMES;
+  $("mc").textContent="";
   $("n0").textContent=t.names[0]; $("n1").textContent=t.names[1];
   $("reset").hidden=d; // Reset only on Marriage
   const fresh=!d&&!anyScore(t);
